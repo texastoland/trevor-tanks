@@ -3,15 +3,7 @@ project(tanks CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(raylib 5 QUIET)
-if(NOT raylib_FOUND)
-  include(FetchContent)
-  FetchContent_Declare(raylib
-    GIT_REPOSITORY https://github.com/raysan5/raylib.git
-    GIT_TAG 5.5)
-  set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(raylib)
-endif()
+find_package(raylib 6 REQUIRED)
 
 add_library(tanks_logic STATIC
   src/arena.cpp src/physics.cpp src/combat.cpp
@@ -27,6 +19,11 @@ if(TARGET glfw)
   # inside one poll batch, which raylib's per-frame state model cannot see)
   target_link_libraries(tanks glfw)
   target_compile_definitions(tanks PRIVATE TANKS_HAVE_GLFW)
+  # Conan's glfw package ships the headers but exports no include dirs (the
+  # CCI recipe never sets cpp_info.includedirs), so point at the package.
+  if(DEFINED glfw_PACKAGE_FOLDER_RELEASE AND NOT glfw_INCLUDE_DIRS_RELEASE)
+    target_include_directories(tanks SYSTEM PRIVATE "${glfw_PACKAGE_FOLDER_RELEASE}/include")
+  endif()
 endif()
 
 enable_testing()

@@ -7,13 +7,13 @@ is fully self-contained.
 
 ## Build
 
-Needs CMake >= 3.16 and a C++17 compiler. Uses system raylib 5.x if installed,
-otherwise fetches and builds it (which needs X11/GL dev headers: on
-Debian/Ubuntu `sudo apt install libx11-dev libxrandr-dev libxinerama-dev
-libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev`).
+Needs CMake >= 3.16 and a C++17 compiler. raylib 6 comes from Conan: `mise`
+installs CMake and the Conan CLI, and `mise run build` resolves the dependency,
+configures with the generated toolchain and compiles. On a profile with no
+prebuilt package, `mise run build:conan` compiles it from source.
 
-    cmake -B build && cmake --build build -j
-    ./build/tanks
+    mise run build
+    mise run run
 
 ## Controls
 
@@ -22,7 +22,7 @@ ricochet each) - right click or Space lays a mine (max 2) - Esc quits.
 
 ## Tests
 
-    ./build/tanks_tests
+    mise run test
 
 Progress (highest mission cleared) is saved to
 `$XDG_DATA_HOME/tanks/progress.txt`.

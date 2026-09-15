@@ -1,0 +1,25 @@
+[tools]
+cmake = "latest"
+"pipx:conan" = "latest"
+
+[tasks."build:conan"]
+description = "Resolve via Conan, compiling deps with no prebuilt package"
+run = "conan install . -of build --build=missing"
+
+[tasks.build]
+description = "Configure against the Conan toolchain and compile"
+depends = ["build:conan"]
+run = """
+cmake --preset conan-release &&
+cmake --build --preset conan-release
+"""
+
+[tasks.test]
+description = "Build and run the unit tests"
+depends = ["build"]
+run = "./build/tanks_tests"
+
+[tasks.run]
+description = "Build and play"
+depends = ["build"]
+run = "./build/tanks"
