@@ -56,7 +56,12 @@ static void latchMouseCb(GLFWwindow* win, int button, int action, int mods) {
     if (g_prevMouseCb) g_prevMouseCb(win, button, action, mods);
 }
 static void installPressLatch() {
-    g_prevMouseCb = glfwSetMouseButtonCallback((GLFWwindow*)GetWindowHandle(), latchMouseCb);
+    // GetWindowHandle() returns the *native* handle (an NSWindow* on macOS, HWND on
+    // Windows, an XID on X11), not a GLFWwindow*. Casting it to GLFWwindow* hands GLFW
+    // a bogus struct and corrupts the native window. Ask GLFW for its own window that
+    // owns raylib's current GL context instead.
+    GLFWwindow* glfwWin = glfwGetCurrentContext();
+    if (glfwWin) g_prevMouseCb = glfwSetMouseButtonCallback(glfwWin, latchMouseCb);
 }
 #else
 static void installPressLatch() {}
